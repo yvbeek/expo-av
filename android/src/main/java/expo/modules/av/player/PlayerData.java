@@ -20,6 +20,7 @@ import expo.modules.av.progress.ProgressLooper;
 public abstract class PlayerData implements AudioEventHandler {
   static final String STATUS_ANDROID_IMPLEMENTATION_KEY_PATH = "androidImplementation";
   static final String STATUS_HEADERS_KEY_PATH = "headers";
+  static final String STATUS_IS_LIVE_STREAM = "isLiveStream";
   static final String STATUS_IS_LOADED_KEY_PATH = "isLoaded";
   public static final String STATUS_URI_KEY_PATH = "uri";
   static final String STATUS_OVERRIDING_EXTENSION_KEY_PATH = "overridingExtension";

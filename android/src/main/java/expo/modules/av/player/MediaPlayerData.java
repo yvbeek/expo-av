@@ -271,6 +271,8 @@ class MediaPlayerData extends PlayerData implements
     map.putBoolean(STATUS_IS_BUFFERING_KEY_PATH, mIsBuffering);
 
     map.putBoolean(STATUS_IS_LOOPING_KEY_PATH, mMediaPlayer.isLooping());
+
+    map.putBoolean(STATUS_IS_LIVE_STREAM, false);
   }
 
   // Video specific stuff

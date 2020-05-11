@@ -198,6 +198,8 @@ class SimpleExoPlayerData extends PlayerData
         mIsLoading || mSimpleExoPlayer.getPlaybackState() == Player.STATE_BUFFERING);
 
     map.putBoolean(STATUS_IS_LOOPING_KEY_PATH, mIsLooping);
+
+    map.putBoolean(STATUS_IS_LIVE_STREAM, mSimpleExoPlayer.isCurrentWindowLive());
   }
 
   // Video specific stuff

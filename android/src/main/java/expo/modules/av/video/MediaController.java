@@ -317,8 +317,13 @@ public class MediaController extends FrameLayout {
       mProgress.setSecondaryProgress(percent * 10);
     }
 
-    if (mEndTime != null)
-      mEndTime.setText(stringForTime(duration));
+    if (mPlayer.isLiveStream()) {
+      mEndTime.setText("Live");
+    } else {
+      if (mEndTime != null)
+        mEndTime.setText(stringForTime(duration));
+    }
+
     if (mCurrentTime != null)
       mCurrentTime.setText(stringForTime(position));
 

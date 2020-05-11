@@ -92,6 +92,11 @@ public class PlayerDataControl implements MediaController.MediaPlayerControl {
     return mPlayerData.isPresentedFullscreen();
   }
 
+  public boolean isLiveStream() {
+    final Bundle status = mPlayerData.getStatus();
+    return status.getBoolean(PlayerData.STATUS_IS_LIVE_STREAM);
+  }
+
   public void toggleFullscreen() {
     mPlayerData.toggleFullscreen();
   }
