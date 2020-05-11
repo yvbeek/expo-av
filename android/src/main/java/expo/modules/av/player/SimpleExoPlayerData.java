@@ -365,7 +365,9 @@ class SimpleExoPlayerData extends PlayerData
         return new DashMediaSource(uri, factory,
             new DefaultDashChunkSource.Factory(factory), mainHandler, this);
       case C.TYPE_HLS:
-        return new HlsMediaSource(uri, factory, mainHandler, this);
+        HlsMediaSource source = new HlsMediaSource.Factory(factory).createMediaSource(uri);
+        source.addEventListener(mainHandler, this);
+        return source;
       case C.TYPE_OTHER:
         return new ExtractorMediaSource(uri, factory, new DefaultExtractorsFactory(), mainHandler, this);
       default: {

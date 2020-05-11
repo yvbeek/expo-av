@@ -67,7 +67,7 @@ android {
       useJUnitPlatform()
     }
   }
-  
+
 }
 
 if (new File(rootProject.projectDir.parentFile, 'package.json').exists()) {
@@ -81,11 +81,9 @@ if (new File(rootProject.projectDir.parentFile, 'package.json').exists()) {
 dependencies {
   unimodule "unimodules-core"
   unimodule "unimodules-permissions-interface"
-  // Newer version introduces dependency versions conflict
-  // on 'com.android.support:support-annotations'
-  api 'com.google.android.exoplayer:exoplayer:2.9.2'
 
-  api 'com.google.android.exoplayer:extension-okhttp:2.9.2'
+  api 'com.google.android.exoplayer:exoplayer:2.11.4'
+  api 'com.google.android.exoplayer:extension-okhttp:2.11.4'
 
   api 'com.yqritc:android-scalablevideoview:1.0.1'
 
