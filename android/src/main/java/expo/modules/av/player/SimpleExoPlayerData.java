@@ -364,15 +364,10 @@ class SimpleExoPlayerData extends PlayerData
       case C.TYPE_DASH:
         return new DashMediaSource(uri, factory,
             new DefaultDashChunkSource.Factory(factory), mainHandler, this);
-      case C.TYPE_HLS:
+      default:
         HlsMediaSource source = new HlsMediaSource.Factory(factory).createMediaSource(uri);
         source.addEventListener(mainHandler, this);
         return source;
-      case C.TYPE_OTHER:
-        return new ExtractorMediaSource(uri, factory, new DefaultExtractorsFactory(), mainHandler, this);
-      default: {
-        throw new IllegalStateException("Content of this type is unsupported at the moment. Unsupported type: " + type);
-      }
     }
   }
 
