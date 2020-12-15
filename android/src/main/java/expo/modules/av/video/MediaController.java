@@ -320,8 +320,8 @@ public class MediaController extends FrameLayout {
     if (mPlayer.isLiveStream()) {
       mEndTime.setText("Live");
     } else {
-    if (mEndTime != null)
-      mEndTime.setText(stringForTime(duration));
+      if (mEndTime != null)
+        mEndTime.setText(stringForTime(duration));
     }
 
     if (mCurrentTime != null)
