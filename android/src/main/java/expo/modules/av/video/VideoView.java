@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.widget.FrameLayout;
@@ -82,6 +83,11 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
     mMediaController = new MediaController(VideoView.this.getContext());
     mMediaController.setAnchorView(this);
     maybeUpdateMediaControllerForUseNativeControls();
+  }
+
+  @Override
+  public boolean dispatchKeyEvent(KeyEvent event) {
+    return mMediaController.dispatchKeyEvent(event);
   }
 
   public void unloadPlayerAndMediaController() {

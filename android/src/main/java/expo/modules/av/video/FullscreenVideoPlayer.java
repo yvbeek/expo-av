@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
 import androidx.annotation.NonNull;
+
+import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -70,6 +72,17 @@ public class FullscreenVideoPlayer extends Dialog {
 
     mKeepScreenOnUpdater = new KeepScreenOnUpdater(this);
     mKeepScreenOnHandler = new Handler();
+  }
+
+  @Override
+  public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+    int keyCode = event.getKeyCode();
+    if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_MENU) {
+      dismiss();
+      return super.dispatchKeyEvent(event);
+    }
+
+    return mVideoView.dispatchKeyEvent(event);
   }
 
   @Override
