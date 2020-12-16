@@ -16,16 +16,13 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.AdaptiveMediaSourceEventListener;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoadEventInfo;
+import com.google.android.exoplayer2.source.MediaLoadData;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
@@ -43,17 +40,17 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import java.io.IOException;
 import java.util.Map;
 
 import expo.modules.av.AVManagerInterface;
 import expo.modules.av.AudioFocusNotAcquiredException;
-import expo.modules.av.player.datasource.CustomHeadersOkHttpDataSourceFactory;
 import expo.modules.av.player.datasource.DataSourceFactoryProvider;
 
 class SimpleExoPlayerData extends PlayerData
-  implements Player.EventListener, ExtractorMediaSource.EventListener, SimpleExoPlayer.VideoListener, AdaptiveMediaSourceEventListener {
+  implements Player.EventListener, MediaSourceEventListener, VideoListener {
 
   private static final String IMPLEMENTATION_NAME = "SimpleExoPlayer";
   private static final String TAG = SimpleExoPlayerData.class.getSimpleName();
@@ -87,21 +84,23 @@ class SimpleExoPlayerData extends PlayerData
   public void load(final Bundle status, final LoadCompletionListener loadCompletionListener) {
     mLoadCompletionListener = loadCompletionListener;
 
+    // AV context
+    final Context context = mAVModule.getContext();
+
     // Create a default TrackSelector
     final Handler mainHandler = new Handler();
+
     // Measures bandwidth during playback. Can be null if not required.
-    final BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+    final BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(context).build();
     final TrackSelection.Factory trackSelectionFactory = new AdaptiveTrackSelection.Factory();
-    final TrackSelector trackSelector = new DefaultTrackSelector(trackSelectionFactory);
+    final TrackSelector trackSelector = new DefaultTrackSelector(context, trackSelectionFactory);
 
     // Create the player
-    mSimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(
-      mAVModule.getContext(),
-      new DefaultRenderersFactory(mAVModule.getContext()),
-      trackSelector,
-      new DefaultLoadControl(),
-      null,
-      bandwidthMeter);
+    mSimpleExoPlayer = new SimpleExoPlayer.Builder(context, new DefaultRenderersFactory(context))
+            .setBandwidthMeter(bandwidthMeter)
+            .setLoadControl(new DefaultLoadControl())
+            .setTrackSelector(trackSelector)
+            .build();
     mSimpleExoPlayer.addListener(this);
     mSimpleExoPlayer.addVideoListener(this);
 
@@ -112,7 +111,8 @@ class SimpleExoPlayerData extends PlayerData
       final MediaSource source = buildMediaSource(mUri, mOverridingExtension, mainHandler, dataSourceFactory);
 
       // Prepare the player with the source.
-      mSimpleExoPlayer.prepare(source);
+      mSimpleExoPlayer.setMediaSource(source);
+      mSimpleExoPlayer.prepare();
       setStatus(status, null);
     } catch (IllegalStateException e) {
       onFatalError(e);
@@ -260,7 +260,7 @@ class SimpleExoPlayerData extends PlayerData
   // ExoPlayer.EventListener
 
   @Override
-  public void onLoadingChanged(final boolean isLoading) {
+  public void onIsLoadingChanged(final boolean isLoading) {
     mIsLoading = isLoading;
     callStatusUpdateListener();
   }
@@ -331,16 +331,7 @@ class SimpleExoPlayerData extends PlayerData
   }
 
 
-  // ExtractorMediaSource.EventListener
-
-  @Override
-  public void onLoadError(final IOException error) {
-    if (mLoadCompletionListener != null) {
-      final LoadCompletionListener listener = mLoadCompletionListener;
-      mLoadCompletionListener = null;
-      listener.onLoadError(error.toString());
-    }
-  }
+  // MediaSourceEventListener
 
   private void onFatalError(final Throwable error) {
     if (mLoadCompletionListener != null) {
@@ -400,16 +391,6 @@ class SimpleExoPlayerData extends PlayerData
     }
   }
 
-  // AdaptiveMediaSourceEventListener
-  @Override
-  public void onMediaPeriodCreated(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId) {
-
-  }
-
-  @Override
-  public void onMediaPeriodReleased(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId) {
-
-  }
 
   @Override
   public void onLoadStarted(int windowIndex, @Nullable MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
@@ -428,11 +409,6 @@ class SimpleExoPlayerData extends PlayerData
 
   @Override
   public void onLoadError(int windowIndex, @Nullable MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData, IOException error, boolean wasCanceled) {
-
-  }
-
-  @Override
-  public void onReadingStarted(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId) {
 
   }
 
