@@ -97,6 +97,16 @@ public class PlayerDataControl implements MediaController.MediaPlayerControl {
     return status.getBoolean(PlayerData.STATUS_IS_LIVE_STREAM);
   }
 
+  public void skipBackward() {
+    final int position = getCurrentPosition();
+    seekTo(position - 5000);
+  }
+
+  public void skipForward() {
+    final int position = getCurrentPosition();
+    seekTo(position + 15000);
+  }
+
   public void toggleFullscreen() {
     mPlayerData.toggleFullscreen();
   }

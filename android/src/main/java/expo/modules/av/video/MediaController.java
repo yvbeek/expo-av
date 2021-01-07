@@ -382,6 +382,20 @@ public class MediaController extends FrameLayout {
         show(sDefaultTimeout);
       }
       return true;
+    } else if (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
+            || keyCode == KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD) {
+      if (uniqueDown) {
+        mPlayer.skipForward();
+        show(sDefaultTimeout);
+      }
+      return true;
+    } else if (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
+            || keyCode == KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD) {
+      if (uniqueDown) {
+        mPlayer.skipBackward();
+        show(sDefaultTimeout);
+      }
+      return true;
     } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
         || keyCode == KeyEvent.KEYCODE_VOLUME_UP
         || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
