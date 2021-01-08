@@ -87,7 +87,11 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
 
   @Override
   public boolean dispatchKeyEvent(KeyEvent event) {
-    return mMediaController.dispatchKeyEvent(event);
+    if (mMediaController != null) {
+      return mMediaController.dispatchKeyEvent(event);
+    }
+
+    return true;
   }
 
   public void unloadPlayerAndMediaController() {
