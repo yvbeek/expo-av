@@ -75,8 +75,8 @@ dependencies {
   unimodule "unimodules-core"
   unimodule "unimodules-permissions-interface"
 
-  api 'com.google.android.exoplayer:exoplayer:2.12.2'
-  api 'com.google.android.exoplayer:extension-okhttp:2.12.2'
+  api 'com.google.android.exoplayer:exoplayer:2.12.3'
+  api 'com.google.android.exoplayer:extension-okhttp:2.12.3'
 
   api 'com.yqritc:android-scalablevideoview:1.0.1'
 
