@@ -4,6 +4,12 @@ export declare enum PitchCorrectionQuality {
     Medium,
     High
 }
+export declare type AVInterstitial = {
+    id: string;
+    startTime: number;
+    duration: number;
+    skippable: boolean;
+};
 export declare type AVPlaybackSource = number | {
     uri: string;
     overrideFileExtensionAndroid?: string;

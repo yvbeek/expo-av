@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ImageProps, View } from 'react-native';
-import { AVPlaybackNativeSource, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet } from './AV';
+import { AVInterstitial, AVPlaybackNativeSource, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet } from './AV';
 export declare type VideoNaturalSize = {
     width: number;
     height: number;
@@ -23,6 +23,7 @@ export declare type VideoProps = {
     source?: AVPlaybackSource;
     posterSource?: ImageProps['source'];
     posterStyle?: ImageProps['style'];
+    interstitials?: AVInterstitial[];
     onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void;
     onLoadStart?: () => void;
     onLoad?: (status: AVPlaybackStatus) => void;
@@ -50,6 +51,7 @@ export declare type VideoProps = {
 } & React.ComponentProps<typeof View>;
 export declare type VideoNativeProps = {
     source?: AVPlaybackNativeSource | null;
+    interstitials?: AVInterstitial[] | null;
     resizeMode?: unknown;
     status?: AVPlaybackStatusToSet;
     onLoadStart?: () => void;

@@ -4,6 +4,7 @@ export {
   default as Video,
   VideoProps,
   VideoState,
+  AVInterstitial,
   AVPlaybackNativeSource,
   AVPlaybackStatus,
   AVPlaybackStatusToSet,

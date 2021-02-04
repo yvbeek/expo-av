@@ -16,8 +16,13 @@ import org.unimodules.core.ModuleRegistry;
 import org.unimodules.core.Promise;
 import org.unimodules.core.arguments.ReadableArguments;
 import org.unimodules.core.interfaces.services.EventEmitter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import expo.modules.av.AVManagerInterface;
 import expo.modules.av.AudioEventHandler;
+import expo.modules.av.player.Interstitial;
 import expo.modules.av.player.PlayerData;
 import expo.modules.av.player.PlayerDataControl;
 
@@ -455,6 +460,10 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
         mVideoTextureView.scaleVideoSize(mPlayerData.getVideoWidthHeight(), mResizeMode);
       }
     }
+  }
+
+  void setInterstitials(final Collection<Interstitial> interstitials) {
+    mPlayerData.interstitials = new ArrayList<>(interstitials);
   }
 
   // View

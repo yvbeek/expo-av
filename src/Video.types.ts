@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ImageProps, View } from 'react-native';
 
 import {
+  AVInterstitial,
   AVPlaybackNativeSource,
   AVPlaybackSource,
   AVPlaybackStatus,
@@ -35,6 +36,7 @@ export type VideoProps = {
   source?: AVPlaybackSource; // { uri: 'http://foo/bar.mp4' }, Asset, or require('./foo/bar.mp4')
   posterSource?: ImageProps['source']; // { uri: 'http://foo/bar.mp4' } or require('./foo/bar.mp4')
   posterStyle?: ImageProps['style'];
+  interstitials?: AVInterstitial[];
 
   // Callbacks
   onPlaybackStatusUpdate?: (status: AVPlaybackStatus) => void;
@@ -73,6 +75,7 @@ export type VideoProps = {
 
 export type VideoNativeProps = {
   source?: AVPlaybackNativeSource | null;
+  interstitials?: AVInterstitial[] | null;
   resizeMode?: unknown;
   status?: AVPlaybackStatusToSet;
   onLoadStart?: () => void;

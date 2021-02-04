@@ -5,12 +5,16 @@ import android.content.Context;
 import com.yqritc.scalablevideoview.ScalableType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.unimodules.core.ModuleRegistry;
 import org.unimodules.core.ViewManager;
+import org.unimodules.core.arguments.MapArguments;
 import org.unimodules.core.arguments.ReadableArguments;
 import org.unimodules.core.interfaces.ExpoProp;
+
+import expo.modules.av.player.Interstitial;
 
 public class VideoViewManager extends ViewManager<VideoViewWrapper> {
   public static final String REACT_CLASS = "ExpoVideoView";
@@ -19,6 +23,7 @@ public class VideoViewManager extends ViewManager<VideoViewWrapper> {
   private static final String PROP_USE_NATIVE_CONTROLS = "useNativeControls";
   private static final String PROP_SOURCE = "source";
   private static final String PROP_NATIVE_RESIZE_MODE = "resizeMode";
+  private static final String PROP_INTERSTITIALS = "interstitials";
 
   private ModuleRegistry mModuleRegistry;
 
@@ -107,6 +112,23 @@ public class VideoViewManager extends ViewManager<VideoViewWrapper> {
   @ExpoProp(name = PROP_NATIVE_RESIZE_MODE)
   public void setNativeResizeMode(final VideoViewWrapper videoViewWrapper, final String resizeModeOrdinalString) {
     videoViewWrapper.getVideoViewInstance().setResizeMode(ScalableType.values()[Integer.parseInt(resizeModeOrdinalString)]);
+  }
+
+  @ExpoProp(name = PROP_INTERSTITIALS)
+  public void setInterstitials(final VideoViewWrapper videoViewWrapper, final ArrayList<HashMap<String, Object>> interstitials) {
+    ArrayList<Interstitial> list = new ArrayList<>();
+
+    for (HashMap<String, Object> props: interstitials ) {
+      String id = props.containsKey("id") ? (String) props.get("id") : "";
+      double startTime = props.containsKey("startTime") ? (double) props.get("startTime") : 0;
+      double duration = props.containsKey("duration") ? (double) props.get("duration") : 0;
+      boolean skippable = props.containsKey("skippable") && (boolean) props.get("skippable");
+
+      Interstitial interstitial = new Interstitial(id, startTime, duration, skippable);
+      list.add(interstitial);
+    }
+
+    videoViewWrapper.getVideoViewInstance().setInterstitials(list);
   }
 
   @Override

@@ -25,6 +25,7 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import expo.modules.av.R;
+import expo.modules.av.player.Interstitial;
 import expo.modules.av.player.PlayerDataControl;
 
 // Based on https://www.brightec.co.uk/ideas/custom-android-media-controller
@@ -61,6 +62,11 @@ public class MediaController extends FrameLayout {
   private ImageButton mPrevButton;
   private ImageButton mFullscreenButton;
   private Handler mHandler = new MessageHandler(this);
+
+  private View mOverlay;
+  private TextView mOverlayInterstitial;
+  private ProgressBar mInterstitialProgress;
+  private Interstitial mInterstitial;
 
   public MediaController(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -108,16 +114,22 @@ public class MediaController extends FrameLayout {
   public void setAnchorView(ViewGroup view) {
     mAnchor = view;
 
-    if (mRoot == null) {
-      FrameLayout.LayoutParams frameParams = new FrameLayout.LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT,
-          Gravity.BOTTOM
-      );
-
+    if (mRoot == null || mOverlay == null) {
       removeAllViews();
+
+      View overlayView = makeOverlayView();
+      mAnchor.addView(overlayView, new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              Gravity.TOP
+      ));
+
       View controllerView = makeControllerView();
-      addView(controllerView, frameParams);
+      addView(controllerView, new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              Gravity.BOTTOM
+      ));
     }
   }
 
@@ -136,6 +148,21 @@ public class MediaController extends FrameLayout {
     return mRoot;
   }
 
+  /**
+   * Create the view that lays on top of the video.
+   *
+   * @return The overlay view.
+   */
+  private View makeOverlayView() {
+    LayoutInflater inflate = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    mOverlay = inflate.inflate(R.layout.expo_overlay, null);
+
+    initOverlayView(mOverlay);
+
+    return mOverlay;
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
   private void initControllerView(View v) {
     mPauseButton = v.findViewById(R.id.play_button);
     if (mPauseButton != null) {
@@ -184,12 +211,24 @@ public class MediaController extends FrameLayout {
       mProgress.setMax(1000);
     }
 
+    mInterstitialProgress = v.findViewById(R.id.interstitial_bar);
+    if (mInterstitialProgress != null) {
+      mInterstitialProgress.setOnTouchListener((v1, event) -> true);
+    }
+
     mEndTime = v.findViewById(R.id.end_time_text);
     mCurrentTime = v.findViewById(R.id.current_time_text);
     mFormatBuilder = new StringBuilder();
     mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
     installPrevNextListeners();
+  }
+
+  private void initOverlayView(View v) {
+    mOverlayInterstitial = v.findViewById(R.id.interstitial_text);
+    if (mOverlayInterstitial != null) {
+      mOverlayInterstitial.setVisibility(INVISIBLE);
+    }
   }
 
   /**
@@ -319,15 +358,48 @@ public class MediaController extends FrameLayout {
 
     if (mPlayer.isLiveStream()) {
       mEndTime.setText("Live");
-    } else {
-    if (mEndTime != null)
+    } else if (mEndTime != null) {
       mEndTime.setText(stringForTime(duration));
     }
 
     if (mCurrentTime != null)
       mCurrentTime.setText(stringForTime(position));
 
+    handleInterstitials(position);
+
     return position;
+  }
+
+  private void handleInterstitials(int position) {
+    // Check if there is an interstitial at this position
+    Interstitial interstitial = mPlayer.getInterstitialForPosition(position);
+    boolean inInterstitial = interstitial != null;
+
+    // If there is none or a new one, mark the old one as watched
+    if (interstitial != mInterstitial) {
+      if (mInterstitial != null) { mPlayer.markInterstitialWatched(mInterstitial.id); }
+      mInterstitial = interstitial;
+    }
+
+    // Update the interstitial progress bar
+    if (inInterstitial && mInterstitialProgress != null) {
+      int interstitialDurationSec = (int) (interstitial.endTime - interstitial.startTime) / 1000;
+      int interstitialPositionSec = (int) (position - interstitial.startTime) / 1000;
+      mInterstitialProgress.setMax(interstitialDurationSec);
+      mInterstitialProgress.setProgress(interstitialPositionSec);
+    }
+
+    // Adjust controls
+    mProgress.setVisibility(inInterstitial ? GONE : VISIBLE);
+    mRewindButton.setVisibility(inInterstitial ? INVISIBLE : VISIBLE);
+    mFastForwardButton.setVisibility(inInterstitial ? INVISIBLE : VISIBLE);
+
+    if (mInterstitialProgress != null) {
+      mInterstitialProgress.setVisibility(inInterstitial ? VISIBLE : GONE);
+    }
+    if (mOverlayInterstitial != null) {
+      mOverlayInterstitial.setVisibility(inInterstitial ? VISIBLE : INVISIBLE);
+    }
   }
 
   @SuppressLint("ClickableViewAccessibility")

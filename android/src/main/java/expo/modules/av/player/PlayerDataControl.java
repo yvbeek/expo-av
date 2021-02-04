@@ -88,6 +88,24 @@ public class PlayerDataControl implements MediaController.MediaPlayerControl {
     return mPlayerData.getAudioSessionId();
   }
 
+  public Interstitial getInterstitialForPosition(double position) {
+    for (Interstitial interstitial : mPlayerData.interstitials) {
+      if (interstitial.containsPosition(position)) {
+        return interstitial;
+      }
+    }
+
+    return null;
+  }
+
+  public boolean getInterstitialWatched(String id) {
+    return mPlayerData.interstitialsWatched.contains(id);
+  }
+
+  public void markInterstitialWatched(String id) {
+    mPlayerData.interstitialsWatched.add(id);
+  }
+
   public boolean isFullscreen() {
     return mPlayerData.isPresentedFullscreen();
   }

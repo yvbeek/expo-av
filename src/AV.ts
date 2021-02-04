@@ -17,6 +17,13 @@ export enum PitchCorrectionQuality {
   High = ExponentAV && ExponentAV.Qualities && ExponentAV.Qualities.High,
 }
 
+export type AVInterstitial = {
+  id: string;
+  startTime: number;
+  duration: number;
+  skippable: boolean;
+};
+
 export type AVPlaybackSource =
   | number
   | {

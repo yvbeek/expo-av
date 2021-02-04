@@ -10,6 +10,7 @@ import {
   getUnloadedStatus,
   Playback,
   PlaybackMixin,
+  AVInterstitial,
   AVPlaybackSource,
   AVPlaybackStatus,
   AVPlaybackStatusToSet,
@@ -38,6 +39,7 @@ export {
   VideoReadyForDisplayEvent,
   ResizeMode,
   VideoState,
+  AVInterstitial,
   AVPlaybackStatus,
   AVPlaybackStatusToSet,
   AVPlaybackNativeSource,
@@ -322,6 +324,7 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
 
   render() {
     const source = getNativeSourceFromSource(this.props.source) || undefined;
+    const interstitials = this.props.interstitials;
 
     let nativeResizeMode = ExpoVideoManagerConstants.ScaleNone;
     if (this.props.resizeMode) {
@@ -358,6 +361,7 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
       ...omit(
         this.props,
         'source',
+        'interstitials',
         'onPlaybackStatusUpdate',
         'usePoster',
         'posterSource',
@@ -366,6 +370,7 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
       ),
       style: StyleSheet.flatten([_STYLES.base, this.props.style]),
       source,
+      interstitials,
       resizeMode: nativeResizeMode,
       status,
       onStatusUpdate: this._nativeOnPlaybackStatusUpdate,

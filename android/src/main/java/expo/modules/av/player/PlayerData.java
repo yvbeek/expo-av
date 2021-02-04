@@ -9,6 +9,8 @@ import android.view.Surface;
 import org.unimodules.core.Promise;
 import org.unimodules.core.arguments.ReadableArguments;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 import expo.modules.av.AVManagerInterface;
@@ -37,6 +39,9 @@ public abstract class PlayerData implements AudioEventHandler {
   static final String STATUS_IS_MUTED_KEY_PATH = "isMuted";
   static final String STATUS_IS_LOOPING_KEY_PATH = "isLooping";
   static final String STATUS_DID_JUST_FINISH_KEY_PATH = "didJustFinish";
+
+  public ArrayList<Interstitial> interstitials = new ArrayList<>();
+  public HashSet<String> interstitialsWatched = new HashSet<>();
 
   public static Bundle getUnloadedStatus() {
     final Bundle map = new Bundle();

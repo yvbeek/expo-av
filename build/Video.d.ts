@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { NativeMethods } from 'react-native';
-import { Playback, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet, AVPlaybackNativeSource } from './AV';
+import { Playback, AVInterstitial, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet, AVPlaybackNativeSource } from './AV';
 import { ExponentVideoComponent, VideoFullscreenUpdateEvent, VideoNativeProps, VideoNaturalSize, VideoProps, VideoReadyForDisplayEvent, ResizeMode, VideoState } from './Video.types';
-export { ExponentVideoComponent, VideoFullscreenUpdateEvent, VideoNativeProps, VideoNaturalSize, VideoProps, VideoReadyForDisplayEvent, ResizeMode, VideoState, AVPlaybackStatus, AVPlaybackStatusToSet, AVPlaybackNativeSource, };
+export { ExponentVideoComponent, VideoFullscreenUpdateEvent, VideoNativeProps, VideoNaturalSize, VideoProps, VideoReadyForDisplayEvent, ResizeMode, VideoState, AVInterstitial, AVPlaybackStatus, AVPlaybackStatusToSet, AVPlaybackNativeSource, };
 export declare const FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT = 0;
 export declare const FULLSCREEN_UPDATE_PLAYER_DID_PRESENT = 1;
 export declare const FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS = 2;
