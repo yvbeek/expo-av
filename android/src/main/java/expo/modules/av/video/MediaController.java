@@ -214,6 +214,7 @@ public class MediaController extends FrameLayout {
     mInterstitialProgress = v.findViewById(R.id.interstitial_bar);
     if (mInterstitialProgress != null) {
       mInterstitialProgress.setOnTouchListener((v1, event) -> true);
+      mInterstitialProgress.setMax(1000);
     }
 
     mEndTime = v.findViewById(R.id.end_time_text);
@@ -365,12 +366,12 @@ public class MediaController extends FrameLayout {
     if (mCurrentTime != null)
       mCurrentTime.setText(stringForTime(position));
 
-    handleInterstitials(position);
+    handleInterstitials(position, duration);
 
     return position;
   }
 
-  private void handleInterstitials(int position) {
+  private void handleInterstitials(int position, int duration) {
     // Check if there is an interstitial at this position
     Interstitial interstitial = mPlayer.getInterstitialForPosition(position);
     boolean inInterstitial = interstitial != null;
@@ -383,10 +384,8 @@ public class MediaController extends FrameLayout {
 
     // Update the interstitial progress bar
     if (inInterstitial && mInterstitialProgress != null) {
-      int interstitialDurationSec = (int) (interstitial.endTime - interstitial.startTime) / 1000;
-      int interstitialPositionSec = (int) (position - interstitial.startTime) / 1000;
-      mInterstitialProgress.setMax(interstitialDurationSec);
-      mInterstitialProgress.setProgress(interstitialPositionSec);
+      long progress = duration > 0 ? 1000L * position / duration : 0;
+      mInterstitialProgress.setProgress((int) progress);
     }
 
     // Adjust controls
