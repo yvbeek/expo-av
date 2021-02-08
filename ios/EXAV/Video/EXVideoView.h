@@ -3,6 +3,7 @@
 #import <UMCore/UMModuleRegistry.h>
 
 #import <EXAV/EXAVObject.h>
+#import <EXAV/EXAVInterstitial.h>
 #import <EXAV/EXVideoPlayerViewControllerDelegate.h>
 
 @interface EXVideoView : UIView <EXVideoPlayerViewControllerDelegate, AVPlayerViewControllerDelegate, EXAVObject>
@@ -45,4 +46,5 @@ typedef NS_OPTIONS(NSUInteger, EXVideoFullscreenUpdate)
              resolver:(UMPromiseResolveBlock)resolve
              rejecter:(UMPromiseRejectBlock)reject;
 
+- (void)setInterstitials:(NSArray<EXAVInterstitial *> *)interstitials;
 @end

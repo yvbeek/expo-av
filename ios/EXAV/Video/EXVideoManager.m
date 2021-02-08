@@ -2,6 +2,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+#import <EXAV/EXAVInterstitial.h>
 #import <EXAV/EXVideoManager.h>
 #import <EXAV/EXVideoView.h>
 #import <UMCore/UMUIManager.h>
@@ -58,6 +59,25 @@ UM_VIEW_PROPERTY(source, NSDictionary *, EXVideoView)
 UM_VIEW_PROPERTY(resizeMode, NSString *, EXVideoView)
 {
   [view setNativeResizeMode:value];
+}
+
+UM_VIEW_PROPERTY(interstitials, NSArray *, EXVideoView)
+{
+  NSMutableArray<EXAVInterstitial *> *list = [NSMutableArray array];
+
+  for (NSDictionary *props in value) {
+    NSString *identifier = [props objectForKey:@"id"] ?: @"";
+    double startTime = [[props objectForKey:@"startTime"] doubleValue] ?: 0;
+    double duration = [[props objectForKey:@"duration"] doubleValue] ?: 0;
+    bool skippable = [[props objectForKey:@"skippable"] boolValue] ?: false;
+
+    EXAVInterstitial *interstitial = [EXAVInterstitial
+                                      interstitialWithId:identifier startTime:startTime
+                                      duration:duration skippable:skippable];
+    [list addObject:interstitial];
+  }
+
+  [view setInterstitials:list];
 }
 
 - (NSArray<NSString *> *)supportedEvents
