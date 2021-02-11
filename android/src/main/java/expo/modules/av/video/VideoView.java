@@ -147,7 +147,7 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
   }
 
   public void maybeUpdateMediaControllerForUseNativeControls() {
-    maybeUpdateMediaControllerForUseNativeControls(true);
+    maybeUpdateMediaControllerForUseNativeControls(false);
   }
 
   public void maybeUpdateMediaControllerForUseNativeControls(boolean showMediaControllerIfEnabled) {
@@ -312,7 +312,7 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
 
   void setOverridingUseNativeControls(final Boolean useNativeControls) {
     mOverridingUseNativeControls = useNativeControls;
-    maybeUpdateMediaControllerForUseNativeControls();
+    maybeUpdateMediaControllerForUseNativeControls(true);
   }
 
   void setUseNativeControls(final boolean useNativeControls) {
