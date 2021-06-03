@@ -428,6 +428,8 @@ public class MediaController extends FrameLayout {
       return true;
     }
 
+    boolean inInterstitial = mInterstitial != null;
+
     int keyCode = event.getKeyCode();
     final boolean uniqueDown = event.getRepeatCount() == 0
         && event.getAction() == KeyEvent.ACTION_DOWN;
@@ -459,14 +461,14 @@ public class MediaController extends FrameLayout {
       return true;
     } else if (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
             || keyCode == KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD) {
-      if (uniqueDown) {
+      if (uniqueDown && !inInterstitial) {
         mPlayer.skipForward();
         show(sDefaultTimeout);
       }
       return true;
     } else if (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
             || keyCode == KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD) {
-      if (uniqueDown) {
+      if (uniqueDown && !inInterstitial) {
         mPlayer.skipBackward();
         show(sDefaultTimeout);
       }
