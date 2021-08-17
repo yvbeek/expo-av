@@ -8,6 +8,8 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.upstream.TransferListener;
 
+import java.net.HttpCookie;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.CacheControl;
@@ -28,20 +30,34 @@ public class CustomHeadersOkHttpDataSourceFactory extends HttpDataSource.BaseFac
     mCallFactory = callFactory;
     mUserAgent = userAgent;
     mCacheControl = null;
-    updateRequestProperties(getDefaultRequestProperties(), requestHeaders);
-  }
 
-  protected void updateRequestProperties(HttpDataSource.RequestProperties requestProperties, @Nullable Map<String, Object> requestHeaders) {
     if (requestHeaders != null) {
-      for (Map.Entry<String, Object> headerEntry : requestHeaders.entrySet()) {
-        if (headerEntry.getValue() instanceof String) {
-          requestProperties.set(headerEntry.getKey(), (String) headerEntry.getValue());
-        }
-      }
+      Map<String, String> headers = convertRequestHeaders(requestHeaders);
+      setDefaultRequestProperties(headers);
     }
   }
 
-  protected OkHttpDataSource createDataSourceInternal(HttpDataSource.RequestProperties defaultRequestProperties) {
-    return new OkHttpDataSource(mCallFactory, mUserAgent, null, mCacheControl, defaultRequestProperties);
+  @NonNull
+  protected Map<String, String> convertRequestHeaders(@NonNull Map<String, Object> requestHeaders) {
+    Map<String, String> headers = new HashMap<>(1);
+
+    for (Map.Entry<String, Object> headerEntry : requestHeaders.entrySet()) {
+      if (headerEntry.getValue() instanceof String) {
+        headers.put(headerEntry.getKey(), (String) headerEntry.getValue());
+      }
+    }
+
+    return headers;
+  }
+
+  @NonNull
+  protected OkHttpDataSource createDataSourceInternal(@NonNull HttpDataSource.RequestProperties defaultRequestProperties) {
+    Map<String, String> requestProperties = defaultRequestProperties.getSnapshot();
+
+    return new OkHttpDataSource.Factory(mCallFactory)
+            .setUserAgent(mUserAgent)
+            .setCacheControl(mCacheControl)
+            .setDefaultRequestProperties(requestProperties)
+            .createDataSource();
   }
 }

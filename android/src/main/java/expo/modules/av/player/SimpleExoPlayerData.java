@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -31,6 +32,7 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
@@ -92,7 +94,7 @@ class SimpleExoPlayerData extends PlayerData
 
     // Measures bandwidth during playback. Can be null if not required.
     final BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(context).build();
-    final TrackSelection.Factory trackSelectionFactory = new AdaptiveTrackSelection.Factory();
+    final ExoTrackSelection.Factory trackSelectionFactory = new AdaptiveTrackSelection.Factory();
     final TrackSelector trackSelector = new DefaultTrackSelector(context, trackSelectionFactory);
 
     // Create the player
@@ -312,7 +314,7 @@ class SimpleExoPlayerData extends PlayerData
   }
 
   @Override
-  public void onPlayerError(final ExoPlaybackException error) {
+  public void onPlayerError(final PlaybackException error) {
     onFatalError(error.getCause());
   }
 
@@ -325,7 +327,7 @@ class SimpleExoPlayerData extends PlayerData
     // Source: https://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/Timeline.Period.html
     // So I guess it's safe to say that when a period transition happens,
     // media file transition happens, so we just finished playing one.
-    if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
+    if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
       callStatusUpdateListenerWithDidJustFinish();
     }
   }
@@ -379,15 +381,17 @@ class SimpleExoPlayerData extends PlayerData
     @C.ContentType int type = TextUtils.isEmpty(overrideExtension) ? Util.inferContentType(String.valueOf(uri)) : Util.inferContentType("." + overrideExtension);
     switch (type) {
       case C.TYPE_SS:
-        return new SsMediaSource(uri, factory,
-          new DefaultSsChunkSource.Factory(factory), mainHandler, this);
+        SsMediaSource ssSource = new SsMediaSource.Factory(factory).createMediaSource(uri);
+        ssSource.addEventListener(mainHandler, this);
+        return ssSource;
       case C.TYPE_DASH:
-        return new DashMediaSource(uri, factory,
-          new DefaultDashChunkSource.Factory(factory), mainHandler, this);
+        DashMediaSource dashSource = new DashMediaSource.Factory(factory).createMediaSource(uri);
+        dashSource.addEventListener(mainHandler, this);
+        return dashSource;
       default:
-        HlsMediaSource source = new HlsMediaSource.Factory(factory).createMediaSource(uri);
-        source.addEventListener(mainHandler, this);
-        return source;
+        HlsMediaSource hlsSource = new HlsMediaSource.Factory(factory).createMediaSource(uri);
+        hlsSource.addEventListener(mainHandler, this);
+        return hlsSource;
     }
   }
 

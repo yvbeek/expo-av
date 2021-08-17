@@ -79,13 +79,13 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${safeExtGet('kotlinVersion', '1.4.21')}"
 
 
-  api 'com.google.android.exoplayer:exoplayer:2.12.3'
-  api 'com.google.android.exoplayer:extension-okhttp:2.12.3'
+  api 'com.google.android.exoplayer:exoplayer:2.15.0'
+  api 'com.google.android.exoplayer:extension-okhttp:2.15.0'
 
   api 'com.yqritc:android-scalablevideoview:1.0.1'
 
-  api "com.squareup.okhttp3:okhttp:3.14.9"
-  api "com.squareup.okhttp3:okhttp-urlconnection:3.14.9"
+  api "com.squareup.okhttp3:okhttp:4.9.1"
+  api "com.squareup.okhttp3:okhttp-urlconnection:4.9.1"
 
   api "com.android.support:support-annotations:${safeExtGet("supportLibVersion", "29.0.0")}"
 }
