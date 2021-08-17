@@ -1,5 +1,3 @@
-import omit from 'lodash/omit';
-import nullthrows from 'nullthrows';
 import * as React from 'react';
 import { findNodeHandle, Image, NativeMethods, StyleSheet, View } from 'react-native';
 
@@ -109,7 +107,8 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
   }
 
   setNativeProps(nativeProps: VideoNativeProps) {
-    const nativeVideo = nullthrows(this._nativeRef.current);
+    const nativeVideo = this._nativeRef.current;
+    if (!nativeVideo) throw new Error(`native video reference is not defined.`);
     nativeVideo.setNativeProps(nativeProps);
   }
 
@@ -358,16 +357,15 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
     // Replace selected native props
     // @ts-ignore: TypeScript thinks "children" is not in the list of props
     const nativeProps: VideoNativeProps = {
-      ...omit(
-        this.props,
+      ...omit(this.props, [
         'source',
         'interstitials',
         'onPlaybackStatusUpdate',
         'usePoster',
         'posterSource',
         'posterStyle',
-        ...Object.keys(status)
-      ),
+        ...Object.keys(status),
+      ]),
       style: StyleSheet.flatten([_STYLES.base, this.props.style]),
       source,
       interstitials,
@@ -388,6 +386,14 @@ export default class Video extends React.Component<VideoProps, VideoState> imple
       </View>
     );
   }
+}
+
+function omit(props: Record<string, any>, propNames: string[]) {
+  const copied = { ...props };
+  for (const propName of propNames) {
+    delete copied[propName];
+  }
+  return copied;
 }
 
 Object.assign(Video.prototype, PlaybackMixin);

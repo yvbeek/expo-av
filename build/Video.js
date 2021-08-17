@@ -1,5 +1,3 @@
-import omit from 'lodash/omit';
-import nullthrows from 'nullthrows';
 import * as React from 'react';
 import { findNodeHandle, Image, StyleSheet, View } from 'react-native';
 import { assertStatusValuesInBounds, getNativeSourceAndFullInitialStatusForLoadAsync, getNativeSourceFromSource, getUnloadedStatus, PlaybackMixin, } from './AV';
@@ -171,7 +169,9 @@ export default class Video extends React.Component {
         };
     }
     setNativeProps(nativeProps) {
-        const nativeVideo = nullthrows(this._nativeRef.current);
+        const nativeVideo = this._nativeRef.current;
+        if (!nativeVideo)
+            throw new Error(`native video reference is not defined.`);
         nativeVideo.setNativeProps(nativeProps);
     }
     setOnPlaybackStatusUpdate(onPlaybackStatusUpdate) {
@@ -213,7 +213,15 @@ export default class Video extends React.Component {
         // Replace selected native props
         // @ts-ignore: TypeScript thinks "children" is not in the list of props
         const nativeProps = {
-            ...omit(this.props, 'source', 'interstitials', 'onPlaybackStatusUpdate', 'usePoster', 'posterSource', 'posterStyle', ...Object.keys(status)),
+            ...omit(this.props, [
+                'source',
+                'interstitials',
+                'onPlaybackStatusUpdate',
+                'usePoster',
+                'posterSource',
+                'posterStyle',
+                ...Object.keys(status),
+            ]),
             style: StyleSheet.flatten([_STYLES.base, this.props.style]),
             source,
             interstitials,
@@ -242,5 +250,12 @@ Video.FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT = FULLSCREEN_UPDATE_PLAYER_WILL_PRES
 Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT = FULLSCREEN_UPDATE_PLAYER_DID_PRESENT;
 Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS = FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS;
 Video.FULLSCREEN_UPDATE_PLAYER_DID_DISMISS = FULLSCREEN_UPDATE_PLAYER_DID_DISMISS;
+function omit(props, propNames) {
+    const copied = { ...props };
+    for (const propName of propNames) {
+        delete copied[propName];
+    }
+    return copied;
+}
 Object.assign(Video.prototype, PlaybackMixin);
 //# sourceMappingURL=Video.js.map
