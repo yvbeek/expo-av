@@ -533,9 +533,9 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
     } else if (value && !_fullscreenPlayerPresented && _fullscreenPlayerViewController && reject) {
       // Fullscreen player should be presented, is being presented, but hasn't been presented yet.
       reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen player is already being presented. Await the first change request.", nil);
-    } else if (!value && _fullscreenPlayerIsDismissing && _fullscreenPlayerViewController && reject) {
-      // Fullscreen player should be dismissing, is already dismissing, but hasn't dismissed yet.
-      reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen player is already being dismissed. Await the first change request.", nil);
+//    } else if (!value && _fullscreenPlayerIsDismissing && _fullscreenPlayerViewController && reject) {
+//      // Fullscreen player should be dismissing, is already dismissing, but hasn't dismissed yet.
+//      reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen player is already being dismissed. Await the first change request.", nil);
     } else if (!value && !_fullscreenPlayerPresented && _fullscreenPlayerViewController && reject) {
       // Fullscreen player is being presented and we receive request to dismiss it.
       reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen player is being presented. Await the `present` request and then dismiss the player.", nil);
