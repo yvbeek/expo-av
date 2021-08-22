@@ -385,7 +385,7 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 }
 
 - (void)handleInterstitialsForPosition:(double)position {
-  if (!_playerViewController || position < 0) { return; }
+  if (position < 0) { return; }
 
   // Check if there is an interstitial at this position
   EXAVInterstitial *interstitial = [self interstitialForPosition:position];
@@ -400,23 +400,28 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 
     // Set the new interstitial
     _interstitial = interstitial;
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (!_playerViewController) { return; }
-
-      // Disable scrubbing, rewind and fast forward
-      _playerViewController.requiresLinearPlayback = inInterstitial;
-      UIView *viewa = _playerViewController.view;
-
-      // Adjust the video overlay
-      for (UIView *subview in _playerViewController.contentOverlayView.subviews) {
-        if ([subview isKindOfClass:EXVideoOverlayView.class]) {
-          EXVideoOverlayView *overlayView = (EXVideoOverlayView *)subview;
-          [overlayView setInterstitialsEnabled:inInterstitial];
-        }
-      }
-    });
   }
+
+  // Update the inline and fullscreen players
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self toggleInterstitialMode:inInterstitial forViewController:_playerViewController];
+    [self toggleInterstitialMode:inInterstitial forViewController:_fullscreenPlayerViewController];
+  });
+}
+
+- (void)toggleInterstitialMode:(BOOL)inInterstitial forViewController:(AVPlayerViewController *)viewController {
+    if (!viewController) { return; }
+
+    // Disable scrubbing, rewind and fast forward
+    viewController.requiresLinearPlayback = inInterstitial;
+
+    // Adjust the video overlay
+    for (UIView *subview in viewController.contentOverlayView.subviews) {
+      if ([subview isKindOfClass:EXVideoOverlayView.class]) {
+        EXVideoOverlayView *overlayView = (EXVideoOverlayView *)subview;
+        [overlayView setInterstitialsEnabled:inInterstitial];
+      }
+    }
 }
 
 - (EXAVInterstitial *)interstitialForPosition:(double)position {
