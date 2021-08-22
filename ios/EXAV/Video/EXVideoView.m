@@ -82,7 +82,7 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 {
   if (_onFullscreenUpdate) {
     _onFullscreenUpdate(@{@"fullscreenUpdate": @(update),
-                          @"status": [_data getStatus]});
+                          @"status": [_data getStatus] ?: @{}});
   }
 }
 
