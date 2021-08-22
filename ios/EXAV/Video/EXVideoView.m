@@ -467,8 +467,9 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 {
   if (!_data) {
     // Tried to set fullscreen for an unloaded component.
-    if (reject) {
-      reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen encountered an error: video is not loaded.", nil);
+    if (resolve) {
+      resolve(@{});
+//      reject(@"E_VIDEO_FULLSCREEN", @"Fullscreen encountered an error: video is not loaded.", nil);
     }
     return;
   } else if (!_playerHasLoaded) {
