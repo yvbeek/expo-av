@@ -126,18 +126,25 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   }
 }
 
-- (void)_removeData
-{
-  if (_data) {
-    [_data pauseImmediately];
-    [_data setStatusUpdateCallback:nil];
-    [_exAV demoteAudioSessionIfPossible];
-    _data = nil;
-  }
-
-  if (_interstitialsWatched) {
-    [_interstitialsWatched removeAllObjects];
-  }
+- (void)_removeData {
+  EX_WEAKIFY(self);
+  void (^block)(void) = ^{
+    EX_ENSURE_STRONGIFY(self);
+    if (self->_data) {
+      [self->_data cleanup];
+      [self->_data pauseImmediately];
+      [self->_data setStatusUpdateCallback:nil];
+      [self->_exAV demoteAudioSessionIfPossible];
+      self->_data = nil;
+    }
+    if (self->_interstitialsWatched) {
+      [self->_interstitialsWatched removeAllObjects];
+    }
+  };
+  // Remove EXAVPlayerData on main thread to prevent race conditions
+  // while KVO messages are dispatched on main thread and the player data is
+  // de-allocating  
+  [EXUtilities performSynchronouslyOnMainThread:block];
 }
 
 - (void)_removePlayer
@@ -340,7 +347,7 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
     }
 
     // When the video is playing normally (not seeking or paused), check for interstitials
-    if (_playerViewController.player.rate > 0) {
+    if (_playerViewController && _playerViewController.player.rate > 0) {
       double position = [[status objectForKey:@"positionMillis"] doubleValue];
       [self handleInterstitialsForPosition:position];
     }
@@ -452,6 +459,17 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   [self _tryUpdateDataStatus:resolve rejecter:reject];
 }
 
+- (void)setStatusFromPlaybackAPI:(NSDictionary *)status
+                        resolver:(EXPromiseResolveBlock)resolve
+                        rejecter:(EXPromiseRejectBlock)reject;
+{
+  EX_WEAKIFY(self);
+  dispatch_async(_exAV.methodQueue, ^{
+    EX_ENSURE_STRONGIFY(self);
+    [self setStatus:status resolver:resolve rejecter:reject];
+  });
+}
+
 - (void)replayWithStatus:(NSDictionary *)status
                 resolver:(EXPromiseResolveBlock)resolve
                 rejecter:(EXPromiseRejectBlock)reject
@@ -560,6 +578,11 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 {
   if (![source isEqualToDictionary:_lastSetSource]) {
     EX_WEAKIFY(self);
+    // ? Why dispatch to _exAV.methodQueue rather than remain on the main thread?
+    // ? Can lead to race conditions with Imperative API being sent on the main thread.
+    // ? I've made Imperative API dispatch to _exAV.methodQueue since I do not know
+    // ? the reason for it, but ultimately I believe Prop setters should run on the main thread
+    // ? rather than move Imperative API methods to _exAV.methodQueue.
     dispatch_async(_exAV.methodQueue, ^{
       EX_ENSURE_STRONGIFY(self);
       self.lastSetSource = source;
@@ -650,6 +673,11 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 - (void)setStatus:(NSDictionary *)status
 {
   EX_WEAKIFY(self);
+  // ? Why dispatch to _exAV.methodQueue rather than remain on the main thread?
+  // ? Can lead to race conditions with Imperative API being sent on the main thread.
+  // ? I've made Imperative API dispatch to _exAV.methodQueue since I do not know
+  // ? the reason for it, but ultimately I believe Prop setters should run on the main thread
+  // ? rather than move Imperative API methods to _exAV.methodQueue.
   dispatch_async(_exAV.methodQueue, ^{
     EX_ENSURE_STRONGIFY(self);
     [self setStatus:status resolver:nil rejecter:nil];

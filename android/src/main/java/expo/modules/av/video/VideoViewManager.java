@@ -2,13 +2,12 @@ package expo.modules.av.video;
 
 import android.content.Context;
 
-import com.yqritc.scalablevideoview.ScalableType;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import expo.modules.av.player.Interstitial;
+import expo.modules.av.video.scalablevideoview.ScalableType;
 import expo.modules.core.ModuleRegistry;
 import expo.modules.core.ViewManager;
 import expo.modules.core.arguments.ReadableArguments;

@@ -47,4 +47,8 @@ typedef NS_OPTIONS(NSUInteger, EXVideoFullscreenUpdate)
              rejecter:(EXPromiseRejectBlock)reject;
 
 - (void)setInterstitials:(NSArray<EXAVInterstitial *> *)interstitials;
+- (void)setStatusFromPlaybackAPI:(NSDictionary *)status
+                        resolver:(EXPromiseResolveBlock)resolve
+                        rejecter:(EXPromiseRejectBlock)reject;
+
 @end
