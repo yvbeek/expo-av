@@ -10,6 +10,7 @@
   if (self = [super initWithFrame:frame]) {
     // Configure the view
     self.translatesAutoresizingMaskIntoConstraints = false;
+    self.userInteractionEnabled = false;
 
     // Create a label for interstitials
     UILabel *interstitialLabel = [[UILabel alloc] init];
@@ -27,10 +28,12 @@
     interstitialLabel.layer.shadowRadius = 2.0;
     [self addSubview:interstitialLabel];
 
-    [interstitialLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:14].active = true;
-    [interstitialLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = true;
-    [interstitialLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = true;
-
+    [NSLayoutConstraint activateConstraints: @[
+      [interstitialLabel.topAnchor constraintEqualToAnchor:self.topAnchor constant:14],
+      [interstitialLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+      [interstitialLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor]
+    ]];
+      
     // Disable interstitials by default
     [self setInterstitialsEnabled:false];
   }

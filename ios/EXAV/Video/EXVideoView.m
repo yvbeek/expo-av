@@ -185,15 +185,19 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   [controller setPlayer:_data.player];
   [controller addObserver:self forKeyPath:EXVideoReadyForDisplayKeyPath options:NSKeyValueObservingOptionNew context:nil];
 
-  UILayoutGuide *overlayGuide = controller.contentOverlayView.safeAreaLayoutGuide;
-  controller.contentOverlayView.translatesAutoresizingMaskIntoConstraints = false;
+  UIView *contentOverlay = controller.contentOverlayView;
+  UILayoutGuide *layoutGuide = contentOverlay.safeAreaLayoutGuide;
 
-  EXVideoOverlayView *overlayView = [[EXVideoOverlayView alloc] init];
-  [controller.contentOverlayView addSubview:overlayView];
-  [overlayView.topAnchor constraintEqualToAnchor:overlayGuide.topAnchor].active = true;
-  [overlayView.leadingAnchor constraintEqualToAnchor:overlayGuide.leadingAnchor].active = true;
-  [overlayView.trailingAnchor constraintEqualToAnchor:overlayGuide.trailingAnchor].active = true;
-  [overlayView.bottomAnchor constraintEqualToAnchor:overlayGuide.bottomAnchor].active = true;
+  EXVideoOverlayView *videoOverlay = [[EXVideoOverlayView alloc] init];
+  [contentOverlay addSubview:videoOverlay];
+
+  [NSLayoutConstraint activateConstraints: @[
+    [videoOverlay.topAnchor constraintEqualToAnchor:layoutGuide.topAnchor],
+    [videoOverlay.bottomAnchor constraintEqualToAnchor:layoutGuide.bottomAnchor],
+    [videoOverlay.leadingAnchor constraintEqualToAnchor:layoutGuide.leadingAnchor],
+    [videoOverlay.trailingAnchor constraintEqualToAnchor:layoutGuide.trailingAnchor]
+  ]];
+
   return controller;
 }
 
