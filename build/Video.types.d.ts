@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ImageProps, ViewProps } from 'react-native';
+import { ImageProps, StyleProp, ViewProps, ViewStyle } from 'react-native';
 import { AVInterstitial, AVPlaybackNativeSource, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet } from './AV';
 export declare type VideoNaturalSize = {
     /**
@@ -104,6 +104,10 @@ export declare type VideoProps = {
      */
     interstitials?: AVInterstitial[];
     /**
+     * An optional property to pass custom styles to the internal video component.
+     */
+    videoStyle?: StyleProp<ViewStyle>;
+    /**
      * A function to be called regularly with the `AVPlaybackStatus` of the video. You will likely be using this a lot.
      * See the [AV documentation](av.md) for further information on `onPlaybackStatusUpdate`, and the interval at which it is called.
      * @param status
@@ -193,6 +197,11 @@ export declare type VideoProps = {
      */
     isMuted?: boolean;
     /**
+     * The desired audio panning value of the audio for this media. This value must be between `-1.0` (full left) and `1.0` (full right).
+     * See the [AV documentation](./av) for more information.
+     */
+    audioPan?: number;
+    /**
      * A boolean describing if the media should play once (`false`) or loop indefinitely (`true`).
      * See the [AV documentation](./av) for more information.
      */
@@ -245,6 +254,7 @@ export declare type VideoNativeProps = {
         nativeEvent: VideoFullscreenUpdateEvent;
     }) => void;
     useNativeControls?: boolean;
+    videoStyle?: StyleProp<ViewStyle>;
 } & ViewProps;
 export declare type VideoState = {
     showPoster: boolean;

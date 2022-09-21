@@ -170,15 +170,13 @@ class Video extends React.Component<VideoProps, VideoState> implements Playback 
   };
 
   componentWillUnmount() {
-    try {
-      // Auto unload video to perform necessary cleanup safely
-      this.unloadAsync();
-    } catch {
-      // Ignored. Sometimes the unloadAsync code is executed when video is already unloaded.
+    // Auto unload video to perform necessary cleanup safely
+    this.unloadAsync().catch(() => {
+      // Ignored rejection. Sometimes the unloadAsync code is executed when video is already unloaded.
       // In such cases, it throws:
       // "[Unhandled promise rejection: Error: Invalid view returned from registry,
       //  expecting EXVideo, got: (null)]"
-    }
+    });
   }
 
   /**
@@ -239,7 +237,7 @@ class Video extends React.Component<VideoProps, VideoState> implements Playback 
     tolerances?: AVPlaybackTolerance
   ) => Promise<AVPlaybackStatus>;
   setRateAsync!: (rate: number, shouldCorrectPitch: boolean) => Promise<AVPlaybackStatus>;
-  setVolumeAsync!: (volume: number) => Promise<AVPlaybackStatus>;
+  setVolumeAsync!: (volume: number, audioPan?: number) => Promise<AVPlaybackStatus>;
   setIsMutedAsync!: (isMuted: boolean) => Promise<AVPlaybackStatus>;
   setIsLoopingAsync!: (isLooping: boolean) => Promise<AVPlaybackStatus>;
   setProgressUpdateIntervalAsync!: (
@@ -336,6 +334,7 @@ class Video extends React.Component<VideoProps, VideoState> implements Playback 
         ...Object.keys(status),
       ]),
       style: StyleSheet.flatten([_STYLES.base, this.props.style]),
+      videoStyle: StyleSheet.flatten([_STYLES.video, this.props.videoStyle]),
       source,
       interstitials,
       resizeMode: nativeResizeMode,
@@ -350,7 +349,7 @@ class Video extends React.Component<VideoProps, VideoState> implements Playback 
 
     return (
       <View style={nativeProps.style} pointerEvents="box-none">
-        <ExponentVideo ref={this._nativeRef} {...nativeProps} style={_STYLES.video} />
+        <ExponentVideo ref={this._nativeRef} {...nativeProps} style={nativeProps.videoStyle} />
         {this._renderPoster()}
       </View>
     );
