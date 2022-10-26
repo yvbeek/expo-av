@@ -1,12 +1,13 @@
 // Copyright 2015-present 650 Industries. All rights reserved.
 
 #import <ExpoModulesCore/EXModuleRegistry.h>
+#import <ExpoModulesCore/EXLegacyExpoViewProtocol.h>
 
 #import <EXAV/EXAVObject.h>
 #import <EXAV/EXAVInterstitial.h>
 #import <EXAV/EXVideoPlayerViewControllerDelegate.h>
 
-@interface EXVideoView : UIView <EXVideoPlayerViewControllerDelegate, AVPlayerViewControllerDelegate, EXAVObject>
+@interface EXVideoView : UIView <EXVideoPlayerViewControllerDelegate, AVPlayerViewControllerDelegate, EXAVObject, EXLegacyExpoViewProtocol>
 
 typedef NS_OPTIONS(NSUInteger, EXVideoFullscreenUpdate)
 {
@@ -27,7 +28,7 @@ typedef NS_OPTIONS(NSUInteger, EXVideoFullscreenUpdate)
 @property (nonatomic, copy) EXDirectEventBlock onReadyForDisplay;
 @property (nonatomic, copy) EXDirectEventBlock onFullscreenUpdate;
 
-- (instancetype)initWithModuleRegistry:(EXModuleRegistry *)moduleRegistry;
+- (instancetype)initWithModuleRegistry:(nullable EXModuleRegistry *)moduleRegistry;
 
 - (void)setStatus:(NSDictionary *)status
          resolver:(EXPromiseResolveBlock)resolve

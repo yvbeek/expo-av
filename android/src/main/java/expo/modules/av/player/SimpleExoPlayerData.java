@@ -13,12 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.LoadEventInfo;
 import com.google.android.exoplayer2.source.MediaLoadData;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -37,7 +36,7 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.VideoListener;
+import com.google.android.exoplayer2.video.VideoSize;
 
 import java.io.IOException;
 import java.util.Map;
@@ -47,7 +46,7 @@ import expo.modules.av.AudioFocusNotAcquiredException;
 import expo.modules.av.player.datasource.DataSourceFactoryProvider;
 
 class SimpleExoPlayerData extends PlayerData
-  implements Player.EventListener, MediaSourceEventListener, VideoListener {
+  implements Player.Listener, MediaSourceEventListener {
 
   private static final String IMPLEMENTATION_NAME = "SimpleExoPlayer";
   private static final String TAG = SimpleExoPlayerData.class.getSimpleName();
@@ -92,7 +91,6 @@ class SimpleExoPlayerData extends PlayerData
         .build();
 
     mSimpleExoPlayer.addListener(this);
-    mSimpleExoPlayer.addVideoListener(this);
 
     // Produces DataSource instances through which media data is loaded.
     final DataSource.Factory dataSourceFactory = mAVModule.getModuleRegistry()
@@ -265,7 +263,7 @@ class SimpleExoPlayerData extends PlayerData
 
   // endregion
 
-  // region ExoPlayer.EventListener
+  // region Player.Listener
 
   @Override
   public void onLoadingChanged(final boolean isLoading) {
@@ -275,11 +273,6 @@ class SimpleExoPlayerData extends PlayerData
 
   @Override
   public void onPlaybackParametersChanged(PlaybackParameters parameters) {
-  }
-
-  @Override
-  public void onSeekProcessed() {
-
   }
 
   @Override
@@ -314,7 +307,7 @@ class SimpleExoPlayerData extends PlayerData
   }
 
   @Override
-  public void onPlayerError(final ExoPlaybackException error) {
+  public void onPlayerError(PlaybackException error) {
     onFatalError(error.getCause());
   }
 
@@ -327,9 +320,25 @@ class SimpleExoPlayerData extends PlayerData
     // Source: https://google.github.io/ExoPlayer/doc/reference/com/google/android/exoplayer2/Timeline.Period.html
     // So I guess it's safe to say that when a period transition happens,
     // media file transition happens, so we just finished playing one.
-    if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
+    if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
       callStatusUpdateListenerWithDidJustFinish();
     }
+  }
+
+  @Override
+  public void onVideoSizeChanged(VideoSize videoSize) {
+    mVideoWidthHeight = new Pair<>(videoSize.width, videoSize.height);
+    if (mFirstFrameRendered && mVideoSizeUpdateListener != null) {
+      mVideoSizeUpdateListener.onVideoSizeUpdate(mVideoWidthHeight);
+    }
+  }
+
+  @Override
+  public void onRenderedFirstFrame() {
+    if (!mFirstFrameRendered && mVideoWidthHeight != null && mVideoSizeUpdateListener != null) {
+      mVideoSizeUpdateListener.onVideoSizeUpdate(mVideoWidthHeight);
+    }
+    mFirstFrameRendered = true;
   }
 
   // endregion
@@ -361,27 +370,6 @@ class SimpleExoPlayerData extends PlayerData
       mErrorListener.onError("Player error: " + error.getMessage());
     }
     release();
-  }
-
-  // endregion
-
-  // region VideoListener
-
-  @Override
-  public void onVideoSizeChanged(final int width, final int height, final int unAppliedRotationDegrees, final float pixelWidthHeightRatio) {
-    // TODO other params?
-    mVideoWidthHeight = new Pair<>(width, height);
-    if (mFirstFrameRendered && mVideoSizeUpdateListener != null) {
-      mVideoSizeUpdateListener.onVideoSizeUpdate(mVideoWidthHeight);
-    }
-  }
-
-  @Override
-  public void onRenderedFirstFrame() {
-    if (!mFirstFrameRendered && mVideoWidthHeight != null && mVideoSizeUpdateListener != null) {
-      mVideoSizeUpdateListener.onVideoSizeUpdate(mVideoWidthHeight);
-    }
-    mFirstFrameRendered = true;
   }
 
   // endregion
