@@ -4,7 +4,6 @@
 #import <ExpoModulesCore/EXLegacyExpoViewProtocol.h>
 
 #import <EXAV/EXAVObject.h>
-#import <EXAV/EXAVInterstitial.h>
 #import <EXAV/EXVideoPlayerViewControllerDelegate.h>
 
 @interface EXVideoView : UIView <EXVideoPlayerViewControllerDelegate, AVPlayerViewControllerDelegate, EXAVObject, EXLegacyExpoViewProtocol>
@@ -47,7 +46,6 @@ typedef NS_OPTIONS(NSUInteger, EXVideoFullscreenUpdate)
              resolver:(EXPromiseResolveBlock)resolve
              rejecter:(EXPromiseRejectBlock)reject;
 
-- (void)setInterstitials:(NSArray<EXAVInterstitial *> *)interstitials;
 - (void)setStatusFromPlaybackAPI:(NSDictionary *)status
                         resolver:(EXPromiseResolveBlock)resolve
                         rejecter:(EXPromiseRejectBlock)reject;

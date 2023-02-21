@@ -3,7 +3,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <ExpoModulesCore/EXUtilities.h>
 #import <EXAV/EXAV.h>
-#import <EXAV/EXVideoOverlayView.h>
 #import <EXAV/EXVideoView.h>
 #import <EXAV/EXAVPlayerData.h>
 #import <EXAV/EXVideoPlayerViewController.h>
@@ -35,10 +34,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
 @property (nonatomic, strong) NSDictionary *lastSetSource;
 @property (nonatomic, strong) NSMutableDictionary *statusToSet;
 
-@property (nonatomic, strong) EXAVInterstitial *interstitial;
-@property (nonatomic, strong) NSMutableArray<EXAVInterstitial *> *interstitials;
-@property (nonatomic, strong) NSMutableSet<NSString *> *interstitialsWatched;
-
 @property (nonatomic, weak) EXModuleRegistry *moduleRegistry;
 
 @end
@@ -67,9 +62,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
     _statusToSet = [NSMutableDictionary new];
     _useNativeControls = NO;
     _nativeResizeMode = AVLayerVideoGravityResizeAspectFill;
-
-    _interstitials = [NSMutableArray array];
-    _interstitialsWatched = [NSMutableSet set];
   }
   
   return self;
@@ -136,9 +128,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
       [self->_exAV demoteAudioSessionIfPossible];
       self->_data = nil;
     }
-    if (self->_interstitialsWatched) {
-      [self->_interstitialsWatched removeAllObjects];
-    }
   };
   // Remove EXAVPlayerData on main thread to prevent race conditions
   // while KVO messages are dispatched on main thread and the player data is
@@ -175,7 +164,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   if (_data == nil) {
     return nil;
   }
-
   EXVideoPlayerViewController *controller = [[EXVideoPlayerViewController alloc] init];
   [controller setShowsPlaybackControls:_useNativeControls];
   [controller setRctDelegate:self];
@@ -183,20 +171,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   [controller.view setFrame:self.bounds];
   [controller setPlayer:_data.player];
   [controller addObserver:self forKeyPath:EXVideoReadyForDisplayKeyPath options:NSKeyValueObservingOptionNew context:nil];
-
-  UIView *contentOverlay = controller.contentOverlayView;
-  UILayoutGuide *layoutGuide = contentOverlay.safeAreaLayoutGuide;
-
-  EXVideoOverlayView *videoOverlay = [[EXVideoOverlayView alloc] init];
-  [contentOverlay addSubview:videoOverlay];
-
-  [NSLayoutConstraint activateConstraints: @[
-    [videoOverlay.topAnchor constraintEqualToAnchor:layoutGuide.topAnchor],
-    [videoOverlay.bottomAnchor constraintEqualToAnchor:layoutGuide.bottomAnchor],
-    [videoOverlay.leadingAnchor constraintEqualToAnchor:layoutGuide.leadingAnchor],
-    [videoOverlay.trailingAnchor constraintEqualToAnchor:layoutGuide.trailingAnchor]
-  ]];
-
   return controller;
 }
 
@@ -348,12 +322,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
     if (self.onStatusUpdate) {
       self.onStatusUpdate(status);
     }
-
-    // When the video is playing normally (not seeking or paused), check for interstitials
-    if (_playerViewController && _playerViewController.player.rate > 0) {
-      double position = [[status objectForKey:@"positionMillis"] doubleValue];
-      [self handleInterstitialsForPosition:position];
-    }
   };
   
   void (^errorCallback)(NSString *) = ^(NSString *error) {
@@ -392,64 +360,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
       self.onLoadStart(nil);
     }
   });
-}
-
-- (void)handleInterstitialsForPosition:(double)position {
-  if (position < 0) { return; }
-
-  // Check if there is an interstitial at this position
-  EXAVInterstitial *interstitial = [self interstitialForPosition:position];
-  bool inInterstitial = interstitial != nil;
-
-  // If there is none or a new one
-  if (interstitial != _interstitial) {
-    // Mark the old one as watched
-    if (_interstitial != nil) {
-      [self markInterstitialWatched:_interstitial.identifier];
-    }
-
-    // Set the new interstitial
-    _interstitial = interstitial;
-  }
-
-  // Update the inline and fullscreen players
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self toggleInterstitialMode:inInterstitial forViewController:_playerViewController];
-    [self toggleInterstitialMode:inInterstitial forViewController:_fullscreenPlayerViewController];
-  });
-}
-
-- (void)toggleInterstitialMode:(BOOL)inInterstitial forViewController:(AVPlayerViewController *)viewController {
-    if (!viewController) { return; }
-
-    // Disable scrubbing, rewind and fast forward
-    viewController.requiresLinearPlayback = inInterstitial;
-
-    // Adjust the video overlay
-    for (UIView *subview in viewController.contentOverlayView.subviews) {
-      if ([subview isKindOfClass:EXVideoOverlayView.class]) {
-        EXVideoOverlayView *overlayView = (EXVideoOverlayView *)subview;
-        [overlayView setInterstitialsEnabled:inInterstitial];
-      }
-    }
-}
-
-- (EXAVInterstitial *)interstitialForPosition:(double)position {
-  for (EXAVInterstitial *interstitial in _interstitials) {
-    if ([interstitial containsPosition:position]) {
-      return interstitial;
-    }
-  }
-
-  return nil;
-}
-
-- (BOOL)interstitialWatched:(NSString *)identifier {
-  return [_interstitialsWatched containsObject:identifier];
-}
-
-- (void)markInterstitialWatched:(NSString *)identifier {
-  [_interstitialsWatched addObject:identifier];
 }
 
 - (void)setStatus:(NSDictionary *)status
@@ -694,10 +604,6 @@ static NSString *const EXAVFullScreenViewControllerClassName = @"AVFullScreenVie
   } else {
     return [EXAVPlayerData getUnloadedStatus];
   }
-}
-
-- (void)setInterstitials:(NSArray<EXAVInterstitial *> *)interstitials {
-  _interstitials = [interstitials mutableCopy];
 }
 
 #pragma mark - React View Management

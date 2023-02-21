@@ -14,8 +14,6 @@ import com.facebook.jni.HybridData;
 import expo.modules.core.Promise;
 import expo.modules.core.arguments.ReadableArguments;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 
 import expo.modules.av.AVManagerInterface;
@@ -49,8 +47,6 @@ public abstract class PlayerData implements AudioEventHandler {
   static final String STATUS_IS_LOOPING_KEY_PATH = "isLooping";
   static final String STATUS_DID_JUST_FINISH_KEY_PATH = "didJustFinish";
 
-  public ArrayList<Interstitial> interstitials = new ArrayList<>();
-  public HashSet<String> interstitialsWatched = new HashSet<>();
   @DoNotStrip
   private final HybridData mHybridData;
 

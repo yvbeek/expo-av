@@ -29,23 +29,6 @@ public final class VideoViewModule: Module {
         "onReadyForDisplay",
         "onFullscreenUpdate"
       )
-        
-      Prop("interstitials") { (view: EXVideoView, interstitials: [[String: Any]]) in
-        var list: [EXAVInterstitial] = []
-
-        for props in interstitials {
-          let identifier = interstitials["id", default: ""]
-          let startTime = interstitials["startTime", default: 0.0]
-          let duration = interstitials["duration", default: 0.0]
-          let skippable = interstitials["skippable", default: false]
-          
-          let interstitial = EXAVInterstitial(id: identifier, startTime:startTime, duration:duration, skippable:skippable)
-
-          list.append(interstitial)
-        }
-
-        view.interstitials = list
-      }
 
       Prop("status") { (view: EXVideoView, status: [String: Any]) in
         view.status = status

@@ -8,14 +8,10 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.widget.FrameLayout;
+
 import androidx.annotation.NonNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
 import expo.modules.av.AVManagerInterface;
 import expo.modules.av.AudioEventHandler;
-import expo.modules.av.player.Interstitial;
 import expo.modules.av.player.PlayerData;
 import expo.modules.av.player.PlayerDataControl;
 import expo.modules.av.video.scalablevideoview.ScalableType;
@@ -456,10 +452,6 @@ public class VideoView extends FrameLayout implements AudioEventHandler, Fullscr
         mVideoTextureView.scaleVideoSize(mPlayerData.getVideoWidthHeight(), mResizeMode);
       }
     }
-  }
-
-  void setInterstitials(final Collection<Interstitial> interstitials) {
-    mPlayerData.interstitials = new ArrayList<>(interstitials);
   }
 
   // View

@@ -7,8 +7,6 @@ import expo.modules.core.arguments.MapArguments
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.util.ArrayList
-import java.util.HashMap
 
 class VideoViewModule : Module() {
   override fun definition() = ModuleDefinition {
@@ -29,22 +27,6 @@ class VideoViewModule : Module() {
       )
 
       //region Props set directly in <Video> component
-
-      Prop("interstitials") { view: VideoViewWrapper, interstitials: ArrayList<HashMap<String,Any>> ->
-        val list = ArrayList<Interstitial>()
-
-        for (props in interstitials) {
-          val id = props.getOrDefault("id", "")
-          val startTime = props.getOrDefault("startTime", 0.0)
-          val duration = props.getOrDefault("duration", 0.0)
-          val skippable = props.getOrDefault("skippable", false)
-
-          val interstitial = Interstitial(id, startTime, duration, skippable)
-          list.add(interstitial)
-        }
-
-        view.videoViewInstance.setInterstitials(list)
-      }
 
       Prop("status") { view: VideoViewWrapper, status: ReadableMap ->
         view.videoViewInstance.setStatus(MapArguments(status.toHashMap()), null)
