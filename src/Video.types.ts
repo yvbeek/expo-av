@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { ImageProps, StyleProp, ViewProps, ViewStyle } from 'react-native';
+import { ImageProps, ViewProps, StyleProp, ViewStyle } from 'react-native';
 
 import {
-  AVInterstitial,
   AVPlaybackNativeSource,
   AVPlaybackSource,
   AVPlaybackStatus,
-  AVPlaybackStatusToSet
+  AVPlaybackStatusToSet,
 } from './AV';
 
 // @needsAudit
@@ -121,10 +120,6 @@ export type VideoProps = {
    */
   posterStyle?: ImageProps['style'];
   /**
-   * An optional set of interstitials that indicate which parts of the stream contain sponsored content.
-   */
-  interstitials?: AVInterstitial[];
-  /**
    * An optional property to pass custom styles to the internal video component.
    */
   videoStyle?: StyleProp<ViewStyle>;
@@ -180,6 +175,13 @@ export type VideoProps = {
    * A boolean which, if set to `true`, will display an image (whose source is set via the prop `posterSource`) while the video is loading.
    */
   usePoster?: boolean;
+  /**
+   * A react-native `Image` like component to display the poster image.
+   */
+  PosterComponent?: React.ComponentType<{
+    style: ImageProps['style'];
+    source: ImageProps['source'];
+  }>;
 
   // Playback API
   /**
@@ -263,7 +265,6 @@ export type VideoProps = {
  */
 export type VideoNativeProps = {
   source?: AVPlaybackNativeSource | null;
-  interstitials?: AVInterstitial[] | null;
   resizeMode?: unknown;
   status?: AVPlaybackStatusToSet;
   onLoadStart?: () => void;

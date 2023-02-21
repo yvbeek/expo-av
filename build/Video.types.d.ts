@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ImageProps, StyleProp, ViewProps, ViewStyle } from 'react-native';
-import { AVInterstitial, AVPlaybackNativeSource, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet } from './AV';
-export declare type VideoNaturalSize = {
+import { ImageProps, ViewProps, StyleProp, ViewStyle } from 'react-native';
+import { AVPlaybackNativeSource, AVPlaybackSource, AVPlaybackStatus, AVPlaybackStatusToSet } from './AV';
+export type VideoNaturalSize = {
     /**
      * A number describing the width in pixels of the video data.
      */
@@ -29,7 +29,7 @@ export declare enum ResizeMode {
      */
     STRETCH = "stretch"
 }
-export declare type VideoReadyForDisplayEvent = {
+export type VideoReadyForDisplayEvent = {
     /**
      * An object containing the basic data about video size.
      */
@@ -57,7 +57,7 @@ export declare enum VideoFullscreenUpdate {
      */
     PLAYER_DID_DISMISS = 3
 }
-export declare type VideoFullscreenUpdateEvent = {
+export type VideoFullscreenUpdateEvent = {
     /**
      * The kind of the fullscreen update.
      */
@@ -77,7 +77,7 @@ export declare type VideoFullscreenUpdateEvent = {
  * Finally, the rest of props are available to control the playback of the video, but we recommend that, for finer control, you use the methods
  * available on the `ref` described in the [AV documentation](./av).
  */
-export declare type VideoProps = {
+export type VideoProps = {
     /**
      * The source of the video data to display. If this prop is `null`, or left blank, the video component will display nothing.
      * Note that this can also be set on the `ref` via `loadAsync()`. See the [AV documentation](./av) for further information.
@@ -99,10 +99,6 @@ export declare type VideoProps = {
      * An optional property to pass custom styles to the poster image.
      */
     posterStyle?: ImageProps['style'];
-    /**
-     * An optional set of interstitials that indicate which parts of the stream contain sponsored content.
-     */
-    interstitials?: AVInterstitial[];
     /**
      * An optional property to pass custom styles to the internal video component.
      */
@@ -154,6 +150,13 @@ export declare type VideoProps = {
      * A boolean which, if set to `true`, will display an image (whose source is set via the prop `posterSource`) while the video is loading.
      */
     usePoster?: boolean;
+    /**
+     * A react-native `Image` like component to display the poster image.
+     */
+    PosterComponent?: React.ComponentType<{
+        style: ImageProps['style'];
+        source: ImageProps['source'];
+    }>;
     /**
      * A dictionary setting a new `AVPlaybackStatusToSet` on the video.
      * See the [AV documentation](./av#default-initial--avplaybackstatustoset) for more information on `AVPlaybackStatusToSet`.
@@ -230,9 +233,8 @@ export declare type VideoProps = {
 /**
  * @hidden
  */
-export declare type VideoNativeProps = {
+export type VideoNativeProps = {
     source?: AVPlaybackNativeSource | null;
-    interstitials?: AVInterstitial[] | null;
     resizeMode?: unknown;
     status?: AVPlaybackStatusToSet;
     onLoadStart?: () => void;
@@ -256,11 +258,11 @@ export declare type VideoNativeProps = {
     useNativeControls?: boolean;
     videoStyle?: StyleProp<ViewStyle>;
 } & ViewProps;
-export declare type VideoState = {
+export type VideoState = {
     showPoster: boolean;
 };
 /**
  * @hidden
  */
-export declare type ExponentVideoComponent = React.ComponentClass<VideoNativeProps>;
+export type ExponentVideoComponent = React.ComponentClass<VideoNativeProps>;
 //# sourceMappingURL=Video.types.d.ts.map

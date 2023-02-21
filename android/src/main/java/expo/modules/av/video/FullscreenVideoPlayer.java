@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
 import androidx.annotation.NonNull;
-
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;

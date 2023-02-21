@@ -204,10 +204,12 @@ class Video extends React.Component {
             this.props.onFullscreenUpdate(event.nativeEvent);
         }
     };
-    _renderPoster = () => this.props.usePoster && this.state.showPoster ? (React.createElement(Image, { style: [_STYLES.poster, this.props.posterStyle], source: this.props.posterSource })) : null;
+    _renderPoster = () => {
+        const PosterComponent = this.props.PosterComponent ?? Image;
+        return this.props.usePoster && this.state.showPoster ? (React.createElement(PosterComponent, { style: [_STYLES.poster, this.props.posterStyle], source: this.props.posterSource })) : null;
+    };
     render() {
         const source = getNativeSourceFromSource(this.props.source) || undefined;
-        const interstitials = this.props.interstitials;
         let nativeResizeMode = ExpoVideoManagerConstants.ScaleNone;
         if (this.props.resizeMode) {
             const resizeMode = this.props.resizeMode;
@@ -241,17 +243,15 @@ class Video extends React.Component {
         const nativeProps = {
             ...omit(this.props, [
                 'source',
-                'interstitials',
                 'onPlaybackStatusUpdate',
                 'usePoster',
                 'posterSource',
                 'posterStyle',
                 ...Object.keys(status),
             ]),
-            style: StyleSheet.flatten([_STYLES.base, this.props.style]),
-            videoStyle: StyleSheet.flatten([_STYLES.video, this.props.videoStyle]),
+            style: [_STYLES.base, this.props.style],
+            videoStyle: [_STYLES.video, this.props.videoStyle],
             source,
-            interstitials,
             resizeMode: nativeResizeMode,
             status,
             onStatusUpdate: this._nativeOnPlaybackStatusUpdate,

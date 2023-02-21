@@ -266,12 +266,5 @@ export type AVPlaybackStatusToSet = {
   pitchCorrectionQuality?: PitchCorrectionQuality;
 };
 
-export type AVInterstitial = {
-  id: string;
-  startTime: number;
-  duration: number;
-  skippable: boolean;
-};
-
 // @docsMissing
 export type AVPlaybackTolerance = { toleranceMillisBefore?: number; toleranceMillisAfter?: number };
